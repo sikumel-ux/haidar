@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petualangan Angka</title>
+    <title>Petualangan Angka Ceria</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4ecdc4">
     <style>
-        /* Menggunakan font sans-serif standar yang bersih & bulat */
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: #e0f2f1;
@@ -20,25 +19,23 @@
 
         .game-container {
             background: white;
-            border-radius: 20px;
+            border-radius: 25px;
             width: 90%;
             max-width: 500px;
-            padding: 25px;
+            padding: 30px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-
-        h1 { color: #2c3e50; font-size: 28px; }
-        p { color: #576574; font-size: 18px; }
 
         input {
             padding: 15px;
             font-size: 18px;
-            border-radius: 10px;
-            border: 2px solid #4ecdc4;
+            border-radius: 12px;
+            border: 3px solid #4ecdc4;
             width: 80%;
             margin-bottom: 20px;
             text-align: center;
+            outline: none;
         }
 
         .btn {
@@ -51,10 +48,10 @@
             border-radius: 50px;
             cursor: pointer;
             width: 100%;
-            box-shadow: 0 4px #ee5253;
+            box-shadow: 0 5px #ee5253;
         }
 
-        .btn:active { transform: translateY(2px); box-shadow: 0 2px #ee5253; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px #ee5253; }
 
         .progress-bar {
             background: #f1f2f6;
@@ -62,6 +59,7 @@
             border-radius: 10px;
             margin: 20px 0;
             overflow: hidden;
+            border: 1px solid #ddd;
         }
 
         #progress-fill {
@@ -73,84 +71,116 @@
 
         .opt-btn {
             background: #ffe66d;
-            border: none;
+            border: 2px solid #feca57;
             padding: 18px;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
-            border-radius: 12px;
-            margin: 5px 0;
+            border-radius: 15px;
+            margin: 8px 0;
             cursor: pointer;
             display: block;
             width: 100%;
+            transition: 0.2s;
         }
 
-        /* Utility */
+        .opt-btn:hover { background: #ffd32a; }
+
         #quiz-screen, #feedback-screen, #result-screen { display: none; }
+        
+        .emoji-hint { font-size: 30px; margin-bottom: 10px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="game-container">
     <div id="welcome-screen">
-        <div style="font-size: 60px;">🐙</div>
+        <div style="font-size: 70px;">🐙</div>
         <h1>Halo Teman!</h1>
-        <p>Siapa nama kamu?</p>
-        <input type="text" id="user-name" placeholder="Ketik namamu..." autofocus>
-        <button class="btn" onclick="startAdventure()">Mulai Misi! 🚀</button>
+        <p>Nama kamu siapa, sih?</p>
+        <input type="text" id="user-name" placeholder="Ketik namamu di sini..." autofocus>
+        <button class="btn" onclick="startAdventure()">Siap, Mulai Misi! 🚀</button>
     </div>
 
     <div id="quiz-screen">
-        <p id="greeting" style="font-weight: bold; color: #ff6b6b;"></p>
+        <p id="greeting" style="font-weight: bold; color: #ff6b6b; margin: 0;"></p>
         <div class="progress-bar"><div id="progress-fill"></div></div>
-        <div id="question" style="font-size: 22px; font-weight: bold; margin-bottom: 20px;"></div>
+        <div id="step-info" style="font-size: 14px; color: #888; margin-bottom: 10px;">Soal 1 dari 25</div>
+        <div id="question-box">
+            <span id="emoji-display" class="emoji-hint"></span>
+            <div id="question-text" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
+        </div>
         <div id="options"></div>
     </div>
 
     <div id="feedback-screen">
-        <div id="fb-emoji" style="font-size: 80px;">🌟</div>
-        <h2 id="fb-msg">Bagus!</h2>
-        <button class="btn" onclick="nextQuestion()" style="background:#4ecdc4; box-shadow: 0 4px #45b3a9;">Lanjut ➡️</button>
+        <div id="fb-emoji" style="font-size: 90px;">🌟</div>
+        <h2 id="fb-msg">Hebat!</h2>
+        <p>Siap untuk misi selanjutnya?</p>
+        <button class="btn" onclick="nextQuestion()" style="background:#4ecdc4; box-shadow: 0 5px #45b3a9;">Ayo Lanjut! ➡️</button>
     </div>
 
     <div id="result-screen">
-        <div style="font-size: 70px;">🏆</div>
-        <h2 id="final-score"></h2>
-        <p id="final-msg"></p>
-        <button class="btn" onclick="location.reload()">Main Lagi</button>
+        <div style="font-size: 80px;">🏆</div>
+        <h2 id="final-score-title">Misi Selesai!</h2>
+        <p id="final-msg" style="font-size: 20px; line-height: 1.6; padding: 0 10px;"></p>
+        <button class="btn" onclick="location.reload()">Main Lagi 🔄</button>
     </div>
 </div>
 
 <script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
 
     let userName = "";
     let currentStep = 0;
     let score = 0;
 
     const quizData = [
-        { q: "2 + 3 = ...", a: ["4", "5", "6"], c: "5", e: "🍎🍎 + 🍎🍎🍎" },
-        { q: "6 + 1 = ...", a: ["6", "7", "8"], c: "7", e: "🐱x6 + 🐱" },
+        // Penjumlahan
+        { q: "2 + 2 = ...", a: ["3", "4", "5"], c: "4", e: "🍎🍎 + 🍎🍎" },
+        { q: "5 + 1 = ...", a: ["6", "7", "4"], c: "6", e: "🐟🐟🐟🐟🐟 + 🐟" },
+        { q: "3 + 3 = ...", a: ["5", "6", "7"], c: "6", e: "🍬🍬🍬 + 🍬🍬🍬" },
+        { q: "4 + 2 = ...", a: ["6", "5", "8"], c: "6", e: "📚📚📚📚 + 📚📚" },
+        { q: "6 + 2 = ...", a: ["7", "8", "9"], c: "8", e: "🐦x6 + 🐦🐦" },
+        { q: "1 + 4 = ...", a: ["4", "5", "6"], c: "5", e: "✏️ + ✏️✏️✏️✏️" },
+        { q: "7 + 3 = ...", a: ["9", "10", "11"], c: "10", e: "🔵x7 + 🔵🔵🔵" },
+        { q: "5 + 5 = ...", a: ["10", "9", "15"], c: "10", e: "🖐️ + 🖐️" },
+        { q: "2 + 5 = ...", a: ["6", "7", "8"], c: "7", e: "🚗🚗 + 🚗x5" },
+        { q: "8 + 1 = ...", a: ["7", "9", "10"], c: "9", e: "🧧x8 + 🧧" },
         { q: "4 + 4 = ...", a: ["7", "8", "9"], c: "8", e: "🎈x4 + 🎈x4" },
-        { q: "10 - 2 = ...", a: ["8", "7", "9"], c: "8", e: "🍪x10 (dimakan 2)" },
-        { q: "5 - 5 = ...", a: ["1", "0", "5"], c: "0", e: "🍬x5 (habis dimakan)" }
-        // Tambahkan soal lainnya sampai 20 di sini...
+        { q: "1 + 6 = ...", a: ["7", "6", "8"], c: "7", e: "🐝 + 🐝x6" },
+        { q: "3 + 7 = ...", a: ["9", "10", "11"], c: "10", e: "🚗x3 + 🚗x7" },
+        // Pengurangan
+        { q: "5 - 2 = ...", a: ["3", "2", "4"], c: "3", e: "🎈🎈🎈🎈🎈 (meletus 2)" },
+        { q: "10 - 4 = ...", a: ["5", "6", "7"], c: "6", e: "🍪x10 (dimakan 4)" },
+        { q: "6 - 3 = ...", a: ["2", "3", "4"], c: "3", e: "🤖x6 (hilang 3)" },
+        { q: "8 - 4 = ...", a: ["4", "5", "3"], c: "4", e: "🐦x8 (terbang 4)" },
+        { q: "7 - 1 = ...", a: ["5", "6", "8"], c: "6", e: "🍊x7 (dimakan 1)" },
+        { q: "9 - 3 = ...", a: ["5", "6", "7"], c: "6", e: "🐱x9 (pergi 3)" },
+        { q: "4 - 2 = ...", a: ["1", "2", "3"], c: "2", e: "🍦x4 (jatuh 2)" },
+        { q: "10 - 5 = ...", a: ["5", "4", "6"], c: "5", e: "🥚x10 (pecah 5)" },
+        { q: "3 - 3 = ...", a: ["1", "0", "3"], c: "0", e: "✈️✈️✈️ (hilang semua)" },
+        { q: "7 - 5 = ...", a: ["1", "2", "3"], c: "2", e: "👕x7 (kotor 5)" },
+        { q: "10 - 7 = ...", a: ["2", "3", "4"], c: "3", e: "🍎x10 (diberikan 7)" },
+        { q: "8 - 8 = ...", a: ["0", "1", "8"], c: "0", e: "🎈x8 (meletus semua)" }
     ];
 
     function startAdventure() {
-        userName = document.getElementById("user-name").value;
-        if (!userName) return alert("Tulis namamu dulu ya!");
+        const input = document.getElementById("user-name");
+        userName = input.value.trim();
+        if (!userName) { alert("Tulis namamu dulu ya sayang!"); return; }
         document.getElementById("welcome-screen").style.display = "none";
         document.getElementById("quiz-screen").style.display = "block";
-        document.getElementById("greeting").innerText = `Halo, ${userName}!`;
+        document.getElementById("greeting").innerText = `Selamat Datang, ${userName}!`;
         loadQuestion();
     }
 
     function loadQuestion() {
         const cur = quizData[currentStep];
-        document.getElementById("progress-fill").style.width = `${(currentStep/quizData.length)*100}%`;
-        document.getElementById("question").innerHTML = `${cur.e}<br>${cur.q}`;
+        document.getElementById("step-info").innerText = `Soal ${currentStep + 1} dari 25`;
+        document.getElementById("progress-fill").style.width = `${(currentStep / quizData.length) * 100}%`;
+        document.getElementById("emoji-display").innerText = cur.e;
+        document.getElementById("question-text").innerText = cur.q;
+        
         const optDiv = document.getElementById("options");
         optDiv.innerHTML = "";
         cur.a.forEach(o => {
@@ -168,8 +198,16 @@
     function showFB(correct) {
         document.getElementById("quiz-screen").style.display = "none";
         document.getElementById("feedback-screen").style.display = "block";
-        document.getElementById("fb-msg").innerText = correct ? `Hebat, ${userName}! Kamu Benar!` : `Hampir tepat, ${userName}!`;
-        document.getElementById("fb-emoji").innerText = correct ? "🎉" : "💡";
+        const msg = document.getElementById("fb-msg");
+        const emo = document.getElementById("fb-emoji");
+        
+        if(correct) {
+            msg.innerText = `Hebat, ${userName}! Jawabanmu BENAR!`;
+            emo.innerText = "🎉";
+        } else {
+            msg.innerText = `Ups, ${userName}! Kurang tepat sedikit.`;
+            emo.innerText = "💡";
+        }
     }
 
     function nextQuestion() {
@@ -185,8 +223,16 @@
 
     function showResult() {
         document.getElementById("result-screen").style.display = "block";
-        document.getElementById("final-score").innerText = `Skor: ${score} / ${quizData.length}`;
-        document.getElementById("final-msg").innerText = score > (quizData.length/2) ? "Kamu luar biasa!" : "Ayo coba lagi!";
+        const finalMsg = document.getElementById("final-msg");
+        const wrong = quizData.length - score;
+
+        if (score === quizData.length) {
+            finalMsg.innerHTML = `<b>${userName}</b>, jawabanmu benar semua (${score} soal).<br>Kamu Hebat sekali! 👑`;
+        } else if (wrong > (quizData.length / 2)) {
+            finalMsg.innerHTML = `<b>${userName}</b>, jawabanmu benar ${score}, yang salah ${wrong}.<br>Belajar lebih giat lagi ya <b>${userName}</b>! Semangat! 💪`;
+        } else {
+            finalMsg.innerHTML = `<b>${userName}</b>, kamu benar ${score} soal.<br>Bagus sekali! Sedikit lagi sempurna! ✨`;
+        }
     }
 </script>
 </body>
