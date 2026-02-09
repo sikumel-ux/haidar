@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Angka</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4ecdc4">
+    <style>
+        /* Menggunakan font sans-serif standar yang bersih & bulat */
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e0f2f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1 { color: #2c3e50; font-size: 28px; }
+        p { color: #576574; font-size: 18px; }
+
+        input {
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: 2px solid #4ecdc4;
+            width: 80%;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px #ee5253;
+        }
+
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px #ee5253; }
+
+        .progress-bar {
+            background: #f1f2f6;
+            height: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            background: #4ecdc4;
+            height: 100%;
+            width: 0%;
+            transition: 0.3s;
+        }
+
+        .opt-btn {
+            background: #ffe66d;
+            border: none;
+            padding: 18px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 12px;
+            margin: 5px 0;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+        }
+
+        /* Utility */
+        #quiz-screen, #feedback-screen, #result-screen { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div id="welcome-screen">
+        <div style="font-size: 60px;">🐙</div>
+        <h1>Halo Teman!</h1>
+        <p>Siapa nama kamu?</p>
+        <input type="text" id="user-name" placeholder="Ketik namamu..." autofocus>
+        <button class="btn" onclick="startAdventure()">Mulai Misi! 🚀</button>
+    </div>
+
+    <div id="quiz-screen">
+        <p id="greeting" style="font-weight: bold; color: #ff6b6b;"></p>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <div id="question" style="font-size: 22px; font-weight: bold; margin-bottom: 20px;"></div>
+        <div id="options"></div>
+    </div>
+
+    <div id="feedback-screen">
+        <div id="fb-emoji" style="font-size: 80px;">🌟</div>
+        <h2 id="fb-msg">Bagus!</h2>
+        <button class="btn" onclick="nextQuestion()" style="background:#4ecdc4; box-shadow: 0 4px #45b3a9;">Lanjut ➡️</button>
+    </div>
+
+    <div id="result-screen">
+        <div style="font-size: 70px;">🏆</div>
+        <h2 id="final-score"></h2>
+        <p id="final-msg"></p>
+        <button class="btn" onclick="location.reload()">Main Lagi</button>
+    </div>
+</div>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+
+    let userName = "";
+    let currentStep = 0;
+    let score = 0;
+
+    const quizData = [
+        { q: "2 + 3 = ...", a: ["4", "5", "6"], c: "5", e: "🍎🍎 + 🍎🍎🍎" },
+        { q: "6 + 1 = ...", a: ["6", "7", "8"], c: "7", e: "🐱x6 + 🐱" },
+        { q: "4 + 4 = ...", a: ["7", "8", "9"], c: "8", e: "🎈x4 + 🎈x4" },
+        { q: "10 - 2 = ...", a: ["8", "7", "9"], c: "8", e: "🍪x10 (dimakan 2)" },
+        { q: "5 - 5 = ...", a: ["1", "0", "5"], c: "0", e: "🍬x5 (habis dimakan)" }
+        // Tambahkan soal lainnya sampai 20 di sini...
+    ];
+
+    function startAdventure() {
+        userName = document.getElementById("user-name").value;
+        if (!userName) return alert("Tulis namamu dulu ya!");
+        document.getElementById("welcome-screen").style.display = "none";
+        document.getElementById("quiz-screen").style.display = "block";
+        document.getElementById("greeting").innerText = `Halo, ${userName}!`;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const cur = quizData[currentStep];
+        document.getElementById("progress-fill").style.width = `${(currentStep/quizData.length)*100}%`;
+        document.getElementById("question").innerHTML = `${cur.e}<br>${cur.q}`;
+        const optDiv = document.getElementById("options");
+        optDiv.innerHTML = "";
+        cur.a.forEach(o => {
+            const b = document.createElement("button");
+            b.className = "opt-btn";
+            b.innerText = o;
+            b.onclick = () => {
+                if(o === cur.c) { score++; showFB(true); }
+                else showFB(false);
+            };
+            optDiv.appendChild(b);
+        });
+    }
+
+    function showFB(correct) {
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("feedback-screen").style.display = "block";
+        document.getElementById("fb-msg").innerText = correct ? `Hebat, ${userName}! Kamu Benar!` : `Hampir tepat, ${userName}!`;
+        document.getElementById("fb-emoji").innerText = correct ? "🎉" : "💡";
+    }
+
+    function nextQuestion() {
+        currentStep++;
+        document.getElementById("feedback-screen").style.display = "none";
+        if(currentStep < quizData.length) {
+            document.getElementById("quiz-screen").style.display = "block";
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById("result-screen").style.display = "block";
+        document.getElementById("final-score").innerText = `Skor: ${score} / ${quizData.length}`;
+        document.getElementById("final-msg").innerText = score > (quizData.length/2) ? "Kamu luar biasa!" : "Ayo coba lagi!";
+    }
+</script>
+</body>
+</html>
