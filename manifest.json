@@ -1,7 +1,7 @@
 {
   "name": "Misi Haidar",
   "short_name": "Haidar",
-  "start_url": "index.html",
+  "start_url": "kuiz.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4ecdc4",
