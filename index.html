@@ -3,184 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Belajar Bersama Ayah</title>
+    <title>Doodle Math Adventure</title>
     <link rel="manifest" href="manifest.json">
     <style>
+        :root {
+            --bg: #fffdf0;
+            --ink: #2d3436;
+            --blue: #0984e3;
+            --green: #00b894;
+            --red: #d63031;
+            --yellow: #fdcb6e;
+        }
+
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f7f4;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#dcdde1 1px, transparent 1px);
+            background-size: 20px 20px;
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; margin: 0;
         }
-        .game-container {
-            background: white; border-radius: 30px; width: 90%; max-width: 450px;
-            padding: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border: 4px solid #4ecdc4;
+
+        .game-card {
+            background: white;
+            border: 4px solid var(--ink);
+            border-radius: 20px;
+            width: 90%; max-width: 450px;
+            padding: 25px; text-align: center;
+            box-shadow: 8px 8px 0px var(--ink);
+            position: relative;
         }
+
+        /* Doodle Style Header */
+        h1 { font-size: 28px; border-bottom: 3px dashed var(--ink); padding-bottom: 10px; }
+
         .btn {
-            background: #ff6b6b; color: white; border: none; padding: 18px;
-            font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer;
-            width: 100%; box-shadow: 0 5px #ee5253; margin-top: 10px;
+            background: var(--yellow);
+            color: var(--ink);
+            border: 3px solid var(--ink);
+            padding: 15px 25px;
+            font-size: 20px; font-weight: bold;
+            border-radius: 15px; cursor: pointer;
+            width: 100%; box-shadow: 4px 4px 0px var(--ink);
+            margin-top: 15px;
         }
+
+        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px var(--ink); }
+
+        .opt-grid { display: grid; gap: 12px; margin-top: 20px; }
+        
         .opt-btn {
-            background: #ffe66d; border: 3px solid #feca57; padding: 18px;
-            font-size: 26px; font-weight: bold; border-radius: 15px; margin: 10px 0;
-            cursor: pointer; width: 100%; transition: 0.2s;
+            background: white; border: 3px solid var(--ink);
+            padding: 15px; font-size: 28px; font-weight: bold;
+            border-radius: 12px; cursor: pointer;
+            transition: 0.2s;
         }
-        .opt-btn:hover { background: #ffd32a; transform: scale(1.02); }
-        input {
-            padding: 15px; font-size: 18px; border-radius: 15px;
-            border: 3px solid #4ecdc4; width: 85%; margin-bottom: 20px; text-align: center;
+
+        .opt-btn:hover { background: #f1f2f6; transform: rotate(-2deg); }
+
+        .progress-bar {
+            height: 15px; background: #eee;
+            border: 3px solid var(--ink); border-radius: 10px;
+            margin: 20px 0; overflow: hidden;
         }
-        .progress-bar { background: #e0e0e0; height: 15px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        #progress-fill { background: #4ecdc4; height: 100%; width: 0%; transition: 0.4s; }
-        #quiz-screen, #feedback-screen, #result-screen { display: none; }
-        .q-text { font-size: 48px; font-weight: 800; color: #2d3436; margin: 25px 0; }
-        .level-badge { background: #4ecdc4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 10px; display: inline-block; }
+
+        #fill { background: var(--green); height: 100%; width: 0%; transition: 0.5s; }
+
+        .badge {
+            display: inline-block; padding: 5px 15px;
+            background: var(--blue); color: white;
+            border-radius: 10px; border: 2px solid var(--ink);
+            font-weight: bold; margin-bottom: 10px;
+        }
+
+        #quiz-screen, #feedback-screen, #level-screen, #result-screen { display: none; }
+
+        .doodle-img { font-size: 60px; margin: 10px; }
     </style>
 </head>
 <body>
 
-<div class="game-container">
+<div class="game-card">
     <div id="welcome-screen">
-        <div style="font-size: 80px;">🚀</div>
-        <h1>Belajar Bersama Ayah</h1>
-        <p>Halo! Siapa namamu?</p>
-        <input type="text" id="user-name" placeholder="Nama kamu..." autofocus>
-        <button class="btn" onclick="startAdventure()">Mulai Petualangan! 🎮</button>
+        <div class="doodle-img">🎨✏️</div>
+        <h1>Misi Doodle Angka</h1>
+        <p>Halo Petualang! Nama kamu siapa?</p>
+        <input type="text" id="user-name" style="width: 80%; padding: 12px; border: 3px solid var(--ink); border-radius: 10px; font-size: 18px; text-align: center;" placeholder="Tulis namamu...">
+        <button class="btn" onclick="startAdventure()">Mulai Misi! 🚀</button>
+    </div>
+
+    <div id="level-screen">
+        <div class="doodle-img">🆙</div>
+        <h2 id="level-title">LEVEL 1</h2>
+        <p id="level-desc">Siap untuk soal-soal mudah?</p>
+        <button class="btn" onclick="startLevel()">Ayo Gas! 🔥</button>
     </div>
 
     <div id="quiz-screen">
-        <div id="level-indicator" class="level-badge">Level: Angka 1-10</div>
-        <div class="progress-bar"><div id="progress-fill"></div></div>
-        <div id="step-info" style="font-weight: bold; color: #636e72;">Soal 1 / 25</div>
-        <div id="question-text" class="q-text"></div>
-        <div id="options"></div>
+        <div class="badge" id="lvl-tag">LEVEL 1</div>
+        <div class="progress-bar"><div id="fill"></div></div>
+        <div id="step-info" style="font-weight: bold;">Soal 1/10</div>
+        <div id="q-text" style="font-size: 50px; font-weight: 900; margin: 30px 0;">2 + 2</div>
+        <div class="opt-grid" id="options"></div>
     </div>
 
     <div id="feedback-screen">
-        <div id="fb-emoji" style="font-size: 100px;"></div>
-        <h2 id="fb-msg"></h2>
-        <p id="level-change-msg" style="color: #4ecdc4; font-weight: bold;"></p>
-        <button class="btn" onclick="generateNext()" style="background:#4ecdc4; box-shadow: 0 5px #45b3a9;">Lanjut ➡️</button>
+        <div id="fb-emoji" style="font-size: 80px;">✨</div>
+        <h2 id="fb-msg">Hebat!</h2>
+        <button class="btn" onclick="nextAction()" id="next-btn">Soal Berikutnya ➡️</button>
     </div>
 
     <div id="result-screen">
-        <div style="font-size: 80px;">🏆</div>
-        <h2>Misi Selesai!</h2>
-        <p id="final-msg" style="font-size: 20px; line-height: 1.5;"></p>
+        <div class="doodle-img">👑</div>
+        <h2>Petualangan Selesai!</h2>
+        <p id="final-msg" style="font-size: 18px;"></p>
         <button class="btn" onclick="location.reload()">Main Lagi 🔄</button>
     </div>
 </div>
 
 <script>
     let userName = "";
+    let currentLevel = 1;
     let currentStep = 0;
     let score = 0;
     let currentAnswer = 0;
-    let maxRange = 10; // Level awal
-    const totalQuestions = 25;
+    const totalStepsPerLevel = 10;
+
+    // Audio Engine (Sound Effects Tanpa File)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(freq, type, dur) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type; osc.frequency.value = freq;
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + dur);
+        osc.stop(audioCtx.currentTime + dur);
+    }
 
     function startAdventure() {
         userName = document.getElementById("user-name").value.trim();
-        if (!userName) return alert("Namanya diisi dulu ya!");
-        document.getElementById("welcome-screen").style.display = "none";
-        document.getElementById("quiz-screen").style.display = "block";
+        if(!userName) return alert("Namanya diisi dulu, Bos!");
+        showScreen('level-screen');
+    }
+
+    function showScreen(id) {
+        ['welcome-screen', 'level-screen', 'quiz-screen', 'feedback-screen', 'result-screen'].forEach(s => {
+            document.getElementById(s).style.display = (s === id) ? 'block' : 'none';
+        });
+    }
+
+    function startLevel() {
+        currentStep = 0;
+        document.getElementById('lvl-tag').innerText = `LEVEL ${currentLevel}`;
+        showScreen('quiz-screen');
         generateQuestion();
     }
 
     function generateQuestion() {
-        document.getElementById("step-info").innerText = `Soal ${currentStep + 1} dari ${totalQuestions}`;
-        document.getElementById("progress-fill").style.width = `${(currentStep / totalQuestions) * 100}%`;
-        document.getElementById("level-indicator").innerText = `Level: Angka 1 - ${maxRange}`;
+        document.getElementById('step-info').innerText = `Soal ${currentStep + 1} / 10`;
+        document.getElementById('fill').style.width = `${(currentStep / 10) * 100}%`;
         
-        let type = Math.floor(Math.random() * 2);
-        let n1, n2, qText;
+        let max = 10 + (currentLevel * 4); // Angka makin gede tiap level
+        let type = Math.random() > 0.5 ? '+' : '-';
+        let n1, n2;
 
-        if (type === 0) { // TAMBAH
-            currentAnswer = Math.floor(Math.random() * (maxRange - 1)) + 2; 
+        if(type === '+') {
+            currentAnswer = Math.floor(Math.random() * (max - 2)) + 2;
             n1 = Math.floor(Math.random() * (currentAnswer - 1)) + 1;
             n2 = currentAnswer - n1;
-            qText = `${n1} + ${n2}`;
-        } else { // KURANG
-            n1 = Math.floor(Math.random() * (maxRange - 2)) + 2; 
+        } else {
+            n1 = Math.floor(Math.random() * (max - 2)) + 2;
             n2 = Math.floor(Math.random() * n1);
             currentAnswer = n1 - n2;
-            qText = `${n1} - ${n2}`;
         }
 
-        document.getElementById("question-text").innerText = qText;
+        document.getElementById('q-text').innerText = `${n1} ${type} ${n2}`;
         setupOptions(currentAnswer);
     }
 
     function setupOptions(correct) {
-        const optDiv = document.getElementById("options");
-        optDiv.innerHTML = "";
+        const div = document.getElementById('options');
+        div.innerHTML = "";
         let choices = [correct];
-        while (choices.length < 3) {
-            let offset = Math.floor(Math.random() * 4) + 1;
-            let fake = Math.random() > 0.5 ? correct + offset : correct - offset;
-            if (fake >= 0 && !choices.includes(fake)) choices.push(fake);
+        while(choices.length < 3) {
+            let fake = correct + (Math.floor(Math.random() * 5) * (Math.random() > 0.5 ? 1 : -1));
+            if(fake >= 0 && !choices.includes(fake)) choices.push(fake);
         }
-        choices.sort(() => Math.random() - 0.5);
-        choices.forEach(val => {
-            const b = document.createElement("button");
-            b.className = "opt-btn";
-            b.innerText = val;
-            b.onclick = () => checkAnswer(val === correct);
-            optDiv.appendChild(b);
+        choices.sort(() => Math.random() - 0.5).forEach(v => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn'; b.innerText = v;
+            b.onclick = () => check(v === correct);
+            div.appendChild(b);
         });
     }
 
-    function checkAnswer(isCorrect) {
-        const levelMsg = document.getElementById("level-change-msg");
-        if (isCorrect) {
+    function check(isCorrect) {
+        if(isCorrect) {
             score++;
-            if (maxRange < 50) {
-                maxRange += 5; // Naik level
-                levelMsg.innerText = "Keren! Level Naik! 📈";
-            } else {
-                levelMsg.innerText = "Kamu sudah di level tertinggi! 🔥";
-            }
+            playSound(600, 'sine', 0.3); playSound(800, 'sine', 0.5);
+            document.getElementById('fb-emoji').innerText = "🎉";
+            document.getElementById('fb-msg').innerText = `Hebat, ${userName}!`;
         } else {
-            if (maxRange > 10) {
-                maxRange -= 5; // Turun level
-                levelMsg.innerText = "Gak apa-apa, soalnya kita gampangin lagi ya.. 📉";
-            } else {
-                levelMsg.innerText = "Jangan menyerah, kamu pasti bisa! 💪";
-            }
+            playSound(200, 'square', 0.2);
+            document.getElementById('fb-emoji').innerText = "💡";
+            document.getElementById('fb-msg').innerText = `Coba lagi, ${userName}!`;
         }
-
-        document.getElementById("quiz-screen").style.display = "none";
-        document.getElementById("feedback-screen").style.display = "block";
-        document.getElementById("fb-emoji").innerText = isCorrect ? "✅" : "❌";
-        document.getElementById("fb-msg").innerText = isCorrect ? `Hebat, ${userName}!` : `Yah, ${userName}...`;
+        showScreen('feedback-screen');
     }
 
-    function generateNext() {
+    function nextAction() {
         currentStep++;
-        document.getElementById("feedback-screen").style.display = "none";
-        if (currentStep < totalQuestions) {
-            document.getElementById("quiz-screen").style.display = "block";
+        if(currentStep < totalStepsPerLevel) {
+            showScreen('quiz-screen');
             generateQuestion();
         } else {
-            showResult();
+            if(currentLevel < 10) {
+                currentLevel++;
+                document.getElementById('level-title').innerText = `LEVEL ${currentLevel}`;
+                document.getElementById('level-desc').innerText = "Wah kamu makin jago! Siap tantangan baru?";
+                showScreen('level-screen');
+                playSound(500, 'triangle', 0.5); playSound(1000, 'sine', 0.5);
+            } else {
+                showResult();
+            }
         }
     }
 
     function showResult() {
-        document.getElementById("result-screen").style.display = "block";
-        const wrong = totalQuestions - score;
-        let msg = `<b>${userName}</b>, jawabanmu benar ${score}, yang salah ${wrong}.<br>`;
-        
-        if (score === totalQuestions) {
-            msg += "Luar biasa! Kamu jenius matematika sejati! 👑";
-        } else if (score > (totalQuestions / 2)) {
-            msg += "Bagus sekali! Kamu sudah berusaha keras. ✨";
-        } else {
-            msg += `Belajar lebih giat lagi ya <b>${userName}</b>! Semangat! 💪`;
-        }
-        document.getElementById("final-msg").innerHTML = msg;
+        showScreen('result-screen');
+        document.getElementById('final-msg').innerHTML = `<b>${userName}</b>, kamu luar biasa!<br>Berhasil menyelesaikan 10 Level!<br>Total Skor: ${score}`;
     }
 </script>
 </body>
