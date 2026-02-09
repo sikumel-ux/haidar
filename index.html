@@ -3,219 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petualangan Angka Ceria</title>
+    <title>Petualangan Angka Pintar</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4ecdc4">
     <style>
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #e0f2f1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
+            background-color: #f0f7f4;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0;
         }
-
         .game-container {
-            background: white;
-            border-radius: 25px;
-            width: 90%;
-            max-width: 500px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: white; border-radius: 30px; width: 90%; max-width: 450px;
+            padding: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 4px solid #4ecdc4;
         }
-
-        input {
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 12px;
-            border: 3px solid #4ecdc4;
-            width: 80%;
-            margin-bottom: 20px;
-            text-align: center;
-            outline: none;
-        }
-
         .btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 5px #ee5253;
+            background: #ff6b6b; color: white; border: none; padding: 18px;
+            font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer;
+            width: 100%; box-shadow: 0 5px #ee5253; margin-top: 10px;
         }
-
-        .btn:active { transform: translateY(3px); box-shadow: 0 2px #ee5253; }
-
-        .progress-bar {
-            background: #f1f2f6;
-            height: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
-
-        #progress-fill {
-            background: #4ecdc4;
-            height: 100%;
-            width: 0%;
-            transition: 0.3s;
-        }
-
         .opt-btn {
-            background: #ffe66d;
-            border: 2px solid #feca57;
-            padding: 18px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 15px;
-            margin: 8px 0;
-            cursor: pointer;
-            display: block;
-            width: 100%;
-            transition: 0.2s;
+            background: #ffe66d; border: 3px solid #feca57; padding: 18px;
+            font-size: 26px; font-weight: bold; border-radius: 15px; margin: 10px 0;
+            cursor: pointer; width: 100%; transition: 0.2s;
         }
-
-        .opt-btn:hover { background: #ffd32a; }
-
+        .opt-btn:hover { background: #ffd32a; transform: scale(1.02); }
+        input {
+            padding: 15px; font-size: 18px; border-radius: 15px;
+            border: 3px solid #4ecdc4; width: 85%; margin-bottom: 20px; text-align: center;
+        }
+        .progress-bar { background: #e0e0e0; height: 15px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
+        #progress-fill { background: #4ecdc4; height: 100%; width: 0%; transition: 0.4s; }
         #quiz-screen, #feedback-screen, #result-screen { display: none; }
-        
-        .emoji-hint { font-size: 30px; margin-bottom: 10px; display: block; }
+        .q-text { font-size: 48px; font-weight: 800; color: #2d3436; margin: 25px 0; }
+        .level-badge { background: #4ecdc4; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; margin-bottom: 10px; display: inline-block; }
     </style>
 </head>
 <body>
 
 <div class="game-container">
     <div id="welcome-screen">
-        <div style="font-size: 70px;">🐙</div>
-        <h1>Halo Teman!</h1>
-        <p>Nama kamu siapa, sih?</p>
-        <input type="text" id="user-name" placeholder="Ketik namamu di sini..." autofocus>
-        <button class="btn" onclick="startAdventure()">Siap, Mulai Misi! 🚀</button>
+        <div style="font-size: 80px;">🚀</div>
+        <h1>Misi Angka Adaptif</h1>
+        <p>Halo! Siapa namamu?</p>
+        <input type="text" id="user-name" placeholder="Nama kamu..." autofocus>
+        <button class="btn" onclick="startAdventure()">Mulai Petualangan! 🎮</button>
     </div>
 
     <div id="quiz-screen">
-        <p id="greeting" style="font-weight: bold; color: #ff6b6b; margin: 0;"></p>
+        <div id="level-indicator" class="level-badge">Level: Angka 1-10</div>
         <div class="progress-bar"><div id="progress-fill"></div></div>
-        <div id="step-info" style="font-size: 14px; color: #888; margin-bottom: 10px;">Soal 1 dari 25</div>
-        <div id="question-box">
-            <span id="emoji-display" class="emoji-hint"></span>
-            <div id="question-text" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
-        </div>
+        <div id="step-info" style="font-weight: bold; color: #636e72;">Soal 1 / 25</div>
+        <div id="question-text" class="q-text"></div>
         <div id="options"></div>
     </div>
 
     <div id="feedback-screen">
-        <div id="fb-emoji" style="font-size: 90px;">🌟</div>
-        <h2 id="fb-msg">Hebat!</h2>
-        <p>Siap untuk misi selanjutnya?</p>
-        <button class="btn" onclick="nextQuestion()" style="background:#4ecdc4; box-shadow: 0 5px #45b3a9;">Ayo Lanjut! ➡️</button>
+        <div id="fb-emoji" style="font-size: 100px;"></div>
+        <h2 id="fb-msg"></h2>
+        <p id="level-change-msg" style="color: #4ecdc4; font-weight: bold;"></p>
+        <button class="btn" onclick="generateNext()" style="background:#4ecdc4; box-shadow: 0 5px #45b3a9;">Lanjut ➡️</button>
     </div>
 
     <div id="result-screen">
         <div style="font-size: 80px;">🏆</div>
-        <h2 id="final-score-title">Misi Selesai!</h2>
-        <p id="final-msg" style="font-size: 20px; line-height: 1.6; padding: 0 10px;"></p>
+        <h2>Misi Selesai!</h2>
+        <p id="final-msg" style="font-size: 20px; line-height: 1.5;"></p>
         <button class="btn" onclick="location.reload()">Main Lagi 🔄</button>
     </div>
 </div>
 
 <script>
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }
-
     let userName = "";
     let currentStep = 0;
     let score = 0;
-
-    const quizData = [
-        // Penjumlahan
-        { q: "2 + 2 = ...", a: ["3", "4", "5"], c: "4", e: "🍎🍎 + 🍎🍎" },
-        { q: "5 + 1 = ...", a: ["6", "7", "4"], c: "6", e: "🐟🐟🐟🐟🐟 + 🐟" },
-        { q: "3 + 3 = ...", a: ["5", "6", "7"], c: "6", e: "🍬🍬🍬 + 🍬🍬🍬" },
-        { q: "4 + 2 = ...", a: ["6", "5", "8"], c: "6", e: "📚📚📚📚 + 📚📚" },
-        { q: "6 + 2 = ...", a: ["7", "8", "9"], c: "8", e: "🐦x6 + 🐦🐦" },
-        { q: "1 + 4 = ...", a: ["4", "5", "6"], c: "5", e: "✏️ + ✏️✏️✏️✏️" },
-        { q: "7 + 3 = ...", a: ["9", "10", "11"], c: "10", e: "🔵x7 + 🔵🔵🔵" },
-        { q: "5 + 5 = ...", a: ["10", "9", "15"], c: "10", e: "🖐️ + 🖐️" },
-        { q: "2 + 5 = ...", a: ["6", "7", "8"], c: "7", e: "🚗🚗 + 🚗x5" },
-        { q: "8 + 1 = ...", a: ["7", "9", "10"], c: "9", e: "🧧x8 + 🧧" },
-        { q: "4 + 4 = ...", a: ["7", "8", "9"], c: "8", e: "🎈x4 + 🎈x4" },
-        { q: "1 + 6 = ...", a: ["7", "6", "8"], c: "7", e: "🐝 + 🐝x6" },
-        { q: "3 + 7 = ...", a: ["9", "10", "11"], c: "10", e: "🚗x3 + 🚗x7" },
-        // Pengurangan
-        { q: "5 - 2 = ...", a: ["3", "2", "4"], c: "3", e: "🎈🎈🎈🎈🎈 (meletus 2)" },
-        { q: "10 - 4 = ...", a: ["5", "6", "7"], c: "6", e: "🍪x10 (dimakan 4)" },
-        { q: "6 - 3 = ...", a: ["2", "3", "4"], c: "3", e: "🤖x6 (hilang 3)" },
-        { q: "8 - 4 = ...", a: ["4", "5", "3"], c: "4", e: "🐦x8 (terbang 4)" },
-        { q: "7 - 1 = ...", a: ["5", "6", "8"], c: "6", e: "🍊x7 (dimakan 1)" },
-        { q: "9 - 3 = ...", a: ["5", "6", "7"], c: "6", e: "🐱x9 (pergi 3)" },
-        { q: "4 - 2 = ...", a: ["1", "2", "3"], c: "2", e: "🍦x4 (jatuh 2)" },
-        { q: "10 - 5 = ...", a: ["5", "4", "6"], c: "5", e: "🥚x10 (pecah 5)" },
-        { q: "3 - 3 = ...", a: ["1", "0", "3"], c: "0", e: "✈️✈️✈️ (hilang semua)" },
-        { q: "7 - 5 = ...", a: ["1", "2", "3"], c: "2", e: "👕x7 (kotor 5)" },
-        { q: "10 - 7 = ...", a: ["2", "3", "4"], c: "3", e: "🍎x10 (diberikan 7)" },
-        { q: "8 - 8 = ...", a: ["0", "1", "8"], c: "0", e: "🎈x8 (meletus semua)" }
-    ];
+    let currentAnswer = 0;
+    let maxRange = 10; // Level awal
+    const totalQuestions = 25;
 
     function startAdventure() {
-        const input = document.getElementById("user-name");
-        userName = input.value.trim();
-        if (!userName) { alert("Tulis namamu dulu ya sayang!"); return; }
+        userName = document.getElementById("user-name").value.trim();
+        if (!userName) return alert("Namanya diisi dulu ya!");
         document.getElementById("welcome-screen").style.display = "none";
         document.getElementById("quiz-screen").style.display = "block";
-        document.getElementById("greeting").innerText = `Selamat Datang, ${userName}!`;
-        loadQuestion();
+        generateQuestion();
     }
 
-    function loadQuestion() {
-        const cur = quizData[currentStep];
-        document.getElementById("step-info").innerText = `Soal ${currentStep + 1} dari 25`;
-        document.getElementById("progress-fill").style.width = `${(currentStep / quizData.length) * 100}%`;
-        document.getElementById("emoji-display").innerText = cur.e;
-        document.getElementById("question-text").innerText = cur.q;
+    function generateQuestion() {
+        document.getElementById("step-info").innerText = `Soal ${currentStep + 1} dari ${totalQuestions}`;
+        document.getElementById("progress-fill").style.width = `${(currentStep / totalQuestions) * 100}%`;
+        document.getElementById("level-indicator").innerText = `Level: Angka 1 - ${maxRange}`;
         
+        let type = Math.floor(Math.random() * 2);
+        let n1, n2, qText;
+
+        if (type === 0) { // TAMBAH
+            currentAnswer = Math.floor(Math.random() * (maxRange - 1)) + 2; 
+            n1 = Math.floor(Math.random() * (currentAnswer - 1)) + 1;
+            n2 = currentAnswer - n1;
+            qText = `${n1} + ${n2}`;
+        } else { // KURANG
+            n1 = Math.floor(Math.random() * (maxRange - 2)) + 2; 
+            n2 = Math.floor(Math.random() * n1);
+            currentAnswer = n1 - n2;
+            qText = `${n1} - ${n2}`;
+        }
+
+        document.getElementById("question-text").innerText = qText;
+        setupOptions(currentAnswer);
+    }
+
+    function setupOptions(correct) {
         const optDiv = document.getElementById("options");
         optDiv.innerHTML = "";
-        cur.a.forEach(o => {
+        let choices = [correct];
+        while (choices.length < 3) {
+            let offset = Math.floor(Math.random() * 4) + 1;
+            let fake = Math.random() > 0.5 ? correct + offset : correct - offset;
+            if (fake >= 0 && !choices.includes(fake)) choices.push(fake);
+        }
+        choices.sort(() => Math.random() - 0.5);
+        choices.forEach(val => {
             const b = document.createElement("button");
             b.className = "opt-btn";
-            b.innerText = o;
-            b.onclick = () => {
-                if(o === cur.c) { score++; showFB(true); }
-                else showFB(false);
-            };
+            b.innerText = val;
+            b.onclick = () => checkAnswer(val === correct);
             optDiv.appendChild(b);
         });
     }
 
-    function showFB(correct) {
+    function checkAnswer(isCorrect) {
+        const levelMsg = document.getElementById("level-change-msg");
+        if (isCorrect) {
+            score++;
+            if (maxRange < 50) {
+                maxRange += 5; // Naik level
+                levelMsg.innerText = "Keren! Level Naik! 📈";
+            } else {
+                levelMsg.innerText = "Kamu sudah di level tertinggi! 🔥";
+            }
+        } else {
+            if (maxRange > 10) {
+                maxRange -= 5; // Turun level
+                levelMsg.innerText = "Gak apa-apa, soalnya kita gampangin lagi ya.. 📉";
+            } else {
+                levelMsg.innerText = "Jangan menyerah, kamu pasti bisa! 💪";
+            }
+        }
+
         document.getElementById("quiz-screen").style.display = "none";
         document.getElementById("feedback-screen").style.display = "block";
-        const msg = document.getElementById("fb-msg");
-        const emo = document.getElementById("fb-emoji");
-        
-        if(correct) {
-            msg.innerText = `Hebat, ${userName}! Jawabanmu BENAR!`;
-            emo.innerText = "🎉";
-        } else {
-            msg.innerText = `Ups, ${userName}! Kurang tepat sedikit.`;
-            emo.innerText = "💡";
-        }
+        document.getElementById("fb-emoji").innerText = isCorrect ? "✅" : "❌";
+        document.getElementById("fb-msg").innerText = isCorrect ? `Hebat, ${userName}!` : `Yah, ${userName}...`;
     }
 
-    function nextQuestion() {
+    function generateNext() {
         currentStep++;
         document.getElementById("feedback-screen").style.display = "none";
-        if(currentStep < quizData.length) {
+        if (currentStep < totalQuestions) {
             document.getElementById("quiz-screen").style.display = "block";
-            loadQuestion();
+            generateQuestion();
         } else {
             showResult();
         }
@@ -223,16 +170,17 @@
 
     function showResult() {
         document.getElementById("result-screen").style.display = "block";
-        const finalMsg = document.getElementById("final-msg");
-        const wrong = quizData.length - score;
-
-        if (score === quizData.length) {
-            finalMsg.innerHTML = `<b>${userName}</b>, jawabanmu benar semua (${score} soal).<br>Kamu Hebat sekali! 👑`;
-        } else if (wrong > (quizData.length / 2)) {
-            finalMsg.innerHTML = `<b>${userName}</b>, jawabanmu benar ${score}, yang salah ${wrong}.<br>Belajar lebih giat lagi ya <b>${userName}</b>! Semangat! 💪`;
+        const wrong = totalQuestions - score;
+        let msg = `<b>${userName}</b>, jawabanmu benar ${score}, yang salah ${wrong}.<br>`;
+        
+        if (score === totalQuestions) {
+            msg += "Luar biasa! Kamu jenius matematika sejati! 👑";
+        } else if (score > (totalQuestions / 2)) {
+            msg += "Bagus sekali! Kamu sudah berusaha keras. ✨";
         } else {
-            finalMsg.innerHTML = `<b>${userName}</b>, kamu benar ${score} soal.<br>Bagus sekali! Sedikit lagi sempurna! ✨`;
+            msg += `Belajar lebih giat lagi ya <b>${userName}</b>! Semangat! 💪`;
         }
+        document.getElementById("final-msg").innerHTML = msg;
     }
 </script>
 </body>
